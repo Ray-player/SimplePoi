@@ -325,6 +325,78 @@ FString UPoiEventSubsystem::PoiActorGroupMapToJsonString()
     return OutputString;
 }
 
+bool UPoiEventSubsystem::GetValueFromJsonString(const FString& JsonString, const FString& Key, FString& OutValue)
+{
+	// 解析JSON字符串
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+ 
+	// 尝试解析JSON
+	if (!FJsonSerializer::Deserialize(Reader, JsonObject) || !JsonObject.IsValid())
+	{
+		// 解析失败
+		OutValue = "";
+		return false;
+	}
+ 
+	// 检查Key是否存在
+	if (JsonObject->HasField(Key))
+	{
+		// 根据值的类型获取字符串表示
+		const TSharedPtr<FJsonValue>& JsonValue = JsonObject->TryGetField(Key);
+		if (JsonValue.IsValid())
+		{
+			// 根据值的类型进行不同的处理
+			switch (JsonValue->Type)
+			{
+			case EJson::String:
+				OutValue = JsonValue->AsString();
+				break;
+			case EJson::Number:
+				OutValue = FString::SanitizeFloat(JsonValue->AsNumber());
+				break;
+			case EJson::Boolean:
+				OutValue = JsonValue->AsBool() ? TEXT("true") : TEXT("false");
+				break;
+			case EJson::Object:
+				{
+					TSharedPtr<FJsonObject> Object = JsonValue->AsObject();
+					TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutValue, 0);
+					if (FJsonSerializer::Serialize(Object.ToSharedRef(), Writer))
+					{
+						Writer->Close();
+					}
+				}
+				break;
+			case EJson::Null:
+				OutValue = TEXT("null");
+				break;
+			default:
+				OutValue = TEXT("");
+				return false;
+			}
+			return true;
+		}
+	}
+ 
+	// Key不存在或获取失败
+	OutValue = "";
+	return false;
+}
+
+bool UPoiEventSubsystem::JsonStringToPoiMessageStruct(const FString& JsonString, FPoiMessageStruct& OutStruct)
+{
+	if (FJsonObjectConverter::JsonObjectStringToUStruct(JsonString, &OutStruct))
+		return true;
+	return false;
+}
+
+bool UPoiEventSubsystem::PoiMessageStructToJsonString(const FPoiMessageStruct& InStruct, FString& OutJsonString)
+{
+	if (FJsonObjectConverter::UStructToJsonObjectString(InStruct, OutJsonString))
+		return true;
+	return false;
+}
 
 bool UPoiEventSubsystem::FindAniSpeed(const FString& AniKeyCut, const FWidgetDataStruct& WidgetData, float& OutSpeed)
 {

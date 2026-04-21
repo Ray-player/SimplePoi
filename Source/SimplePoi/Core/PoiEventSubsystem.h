@@ -433,7 +433,22 @@ public:
 	UFUNCTION(BlueprintPure, Category="PoiCommonFunction|Json")
 	FString PoiActorGroupMapToJsonString();
 
-
+	/**
+	 * 从JSON字符串中根据Key获取对应的值
+	 * @param JsonString 输入的JSON字符串
+	 * @param Key 要查找的键
+	 */
+	UFUNCTION(BlueprintCallable, Category="PoiCommonFunction|Json")
+	static bool GetValueFromJsonString(const FString& JsonString, const FString& Key, FString& OutValue);
+	/**
+	* 将JSON格式的字符串转换为FPoiMessageStruct结构体
+	* 输入格式应为：{"KeyName":"key_value","DataMap":{"key1":"value1","key2":"value2"}}*/
+	UFUNCTION(BlueprintPure, Category = "PoiCommonFunction|Json")
+	static bool JsonStringToPoiMessageStruct(const FString& JsonString,FPoiMessageStruct& OutStruct);
+	//将FPoiMessageStruct结构体转换为JSON字符串
+	UFUNCTION(BlueprintPure, Category="PoiCommonFunction|Json")
+	static bool PoiMessageStructToJsonString(const FPoiMessageStruct& InStruct,FString& OutJsonString);
+	
 	//根据AniKeyCut查找WidgetData中对应的动画速度
 	UFUNCTION(BlueprintPure, Category="PoiCommonFunction|Data")
 	static bool FindAniSpeed(const FString& AniKeyCut, const FWidgetDataStruct& WidgetData, float& OutSpeed);

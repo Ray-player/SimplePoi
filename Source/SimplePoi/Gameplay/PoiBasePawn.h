@@ -47,7 +47,8 @@ protected:
 	
 	UFUNCTION(BlueprintNativeEvent, Category="PoiPawn|Input")
 	void SetupInputComplete(UInputComponent* InPlayerInputComponent);
-	
+	UFUNCTION(BlueprintNativeEvent, Category="PoiPawn|Input")
+	void BeginPlayComplete();
 public:
 	UPROPERTY(Category = "Pawn", VisibleDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UFloatingPawnMovement> MovementComponent;

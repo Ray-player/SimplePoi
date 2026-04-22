@@ -85,13 +85,18 @@ void APoiBasePawn::BeginPlay()
 			EventSubsystem->ReceivedActorSimpleStrByTag.AddDynamic(this,&APoiBasePawn::OnSubsystemCallTagEvent);
 		}
 	}
-	
+	this->BeginPlayComplete();
 	//从聚焦数据中初始化位置
 	// if (!PawnData.InitialFocusMessage.Name.IsEmpty())
 	// {
 	// 	SetActorLocationAndRotation(PawnData.InitialFocusMessage.TargetLocation,
 	// 		PawnData.InitialFocusMessage.TargetRotation);
 	// }
+}
+
+void APoiBasePawn::BeginPlayComplete_Implementation()
+{
+	return;
 }
 
 void APoiBasePawn::AddInputActionBindEvent(const FString ActionName, ETriggerEvent TriggerEvent,

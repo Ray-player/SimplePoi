@@ -458,11 +458,15 @@ public:
 	{
 		return FPoiMessageStruct(InKeyName, *InText.ToString());
 	}
-	//POI消息结构体是否相同
+	//POI消息结构体key与text是否相同
 	UFUNCTION(BlueprintPure, Category="PoiCommonFunction|Data")
 	static bool PoiMessageStructIsEqual(const FPoiMessageStruct& A, const FPoiMessageStruct& B)
 	{
-		return A == B;
+		const FString* TextA = A.DataMap.Find(TEXT("text"));
+		const FString* TextB = B.DataMap.Find(TEXT("text"));
+		return A.KeyName.Equals(B.KeyName) &&
+			TextA != nullptr && TextB != nullptr &&
+			TextA->Equals(*TextB);
 	}
 	//字符串转Base64
 	UFUNCTION(BlueprintPure, Category="PoiCommonFunction|Data")

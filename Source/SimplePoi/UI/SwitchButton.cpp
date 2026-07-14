@@ -6,7 +6,12 @@
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Blueprint/WidgetTree.h"
 #include "Binding/States/WidgetStateRegistration.h"
+// UE 5.6+ 使用 FAppStyle 替代 FDefaultStyleCache
+#if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 6
+#include "Styling/AppStyle.h"
+#else
 #include "Styling/DefaultStyleCache.h"
+#endif
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(SwitchButton)
 
@@ -20,18 +25,31 @@ USwitchButton::USwitchButton(const FObjectInitializer& ObjectInitializer)
 	, bIsSwitchingStyleOnClick(true)
 {
 	// 初始化默认样式
+	// UE 5.6+: FAppStyle::Get().GetWidgetStyle, UE 5.5: FDefaultStyleCache
+#if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 6
+	const FButtonStyle AppButtonStyle = FAppStyle::Get().GetWidgetStyle<FButtonStyle>("Button");
+	DefaultButtonStyle = AppButtonStyle;
+	AlternativeButtonStyle = AppButtonStyle;
+#else
 	PRAGMA_DISABLE_DEPRECATION_WARNINGS
 	DefaultButtonStyle = UE::Slate::Private::FDefaultStyleCache::GetRuntime().GetButtonStyle();
 	AlternativeButtonStyle = UE::Slate::Private::FDefaultStyleCache::GetRuntime().GetButtonStyle();
 	PRAGMA_ENABLE_DEPRECATION_WARNINGS
+#endif
 
 #if WITH_EDITOR
 	if (IsEditorWidget())
 	{
+#if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 6
+		const FButtonStyle EditorButtonStyle = FAppStyle::Get().GetWidgetStyle<FButtonStyle>("Button");
+		DefaultButtonStyle = EditorButtonStyle;
+		AlternativeButtonStyle = EditorButtonStyle;
+#else
 		PRAGMA_DISABLE_DEPRECATION_WARNINGS
 		DefaultButtonStyle = UE::Slate::Private::FDefaultStyleCache::GetEditor().GetButtonStyle();
 		AlternativeButtonStyle = UE::Slate::Private::FDefaultStyleCache::GetEditor().GetButtonStyle();
 		PRAGMA_ENABLE_DEPRECATION_WARNINGS
+#endif
 	}
 #endif // WITH_EDITOR
 	

@@ -6,11 +6,17 @@
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Blueprint/WidgetTree.h"
 #include "Binding/States/WidgetStateRegistration.h"
-// UE 5.6+ 使用 FAppStyle 替代 FDefaultStyleCache
+// Slate 样式 API 版本适配：
+//   UE 5.6+  : FAppStyle（DefaultStyleCache 被移除）
+//   UE 5.4-5.5: FDefaultStyleCache
+//   UE 5.1-5.3: FCoreStyle（运行时）+ FAppStyle（编辑器）
 #if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 6
 #include "Styling/AppStyle.h"
-#else
+#elif ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 4
 #include "Styling/DefaultStyleCache.h"
+#else
+#include "Styling/CoreStyle.h"
+#include "Styling/AppStyle.h"
 #endif
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(SwitchButton)
@@ -24,17 +30,21 @@ USwitchButton::USwitchButton(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 	, bIsSwitchingStyleOnClick(true)
 {
-	// 初始化默认样式
-	// UE 5.6+: FAppStyle::Get().GetWidgetStyle, UE 5.5: FDefaultStyleCache
+	// 初始化默认样式（运行时）
 #if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 6
-	const FButtonStyle AppButtonStyle = FAppStyle::Get().GetWidgetStyle<FButtonStyle>("Button");
-	DefaultButtonStyle = AppButtonStyle;
-	AlternativeButtonStyle = AppButtonStyle;
-#else
+	const FButtonStyle RuntimeButtonStyle = FAppStyle::Get().GetWidgetStyle<FButtonStyle>("Button");
+	DefaultButtonStyle = RuntimeButtonStyle;
+	AlternativeButtonStyle = RuntimeButtonStyle;
+#elif ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 4
 	PRAGMA_DISABLE_DEPRECATION_WARNINGS
 	DefaultButtonStyle = UE::Slate::Private::FDefaultStyleCache::GetRuntime().GetButtonStyle();
 	AlternativeButtonStyle = UE::Slate::Private::FDefaultStyleCache::GetRuntime().GetButtonStyle();
 	PRAGMA_ENABLE_DEPRECATION_WARNINGS
+#else
+	// 5.1-5.3: FCoreStyle 提供运行时按钮样式
+	const FButtonStyle RuntimeButtonStyle = FCoreStyle::Get().GetWidgetStyle<FButtonStyle>("Button");
+	DefaultButtonStyle = RuntimeButtonStyle;
+	AlternativeButtonStyle = RuntimeButtonStyle;
 #endif
 
 #if WITH_EDITOR
@@ -44,11 +54,16 @@ USwitchButton::USwitchButton(const FObjectInitializer& ObjectInitializer)
 		const FButtonStyle EditorButtonStyle = FAppStyle::Get().GetWidgetStyle<FButtonStyle>("Button");
 		DefaultButtonStyle = EditorButtonStyle;
 		AlternativeButtonStyle = EditorButtonStyle;
-#else
+#elif ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 4
 		PRAGMA_DISABLE_DEPRECATION_WARNINGS
 		DefaultButtonStyle = UE::Slate::Private::FDefaultStyleCache::GetEditor().GetButtonStyle();
 		AlternativeButtonStyle = UE::Slate::Private::FDefaultStyleCache::GetEditor().GetButtonStyle();
 		PRAGMA_ENABLE_DEPRECATION_WARNINGS
+#else
+		// 5.1-5.3: FAppStyle 提供编辑器按钮样式
+		const FButtonStyle EditorButtonStyle = FAppStyle::Get().GetWidgetStyle<FButtonStyle>("Button");
+		DefaultButtonStyle = EditorButtonStyle;
+		AlternativeButtonStyle = EditorButtonStyle;
 #endif
 	}
 #endif // WITH_EDITOR

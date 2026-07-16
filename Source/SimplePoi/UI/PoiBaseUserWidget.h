@@ -23,6 +23,8 @@ class IPoiWidgetInterface
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable,Category = "Poi Interface|Widget")
+	void SetBoolMessage(const bool bValue,const FString& Message);
+	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable,Category = "Poi Interface|Widget")
 	void SetWidgetMessageMap(const TMap<FString,FText>& Mes);
 	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable,Category = "Poi Interface|Widget")
 	void SetWidgetPropertyMap(const TMap<FString,FString>& Mes);

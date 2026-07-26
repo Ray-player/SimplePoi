@@ -65,6 +65,47 @@ void UPoiEventSubsystem::FindAllActorInGroup(const FString& InGroup, TArray<AAct
 	}
 }
 
+void UPoiEventSubsystem::SetGroupPoiVisitByWidgetAni(bool GroupVisit, const FString& Group, bool bHideOtherGroups, float InDelayTime)
+{
+	if (Group.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SetGroupPoiVisitByWidgetAni: Group参数为空"));
+		return;
+	}
+	//显示操作且需要先隐藏其他分组时,遍历所有其他分组执行隐藏动画
+	if (GroupVisit && bHideOtherGroups)
+	{
+		for (auto& MapElement : PoiActorGroupMap)
+		{
+			if (MapElement.Key == Group) continue;
+
+			for (auto& ActorPair : MapElement.Value.PoiActorKeyMap)
+			{
+				if (IsValid(ActorPair.Value))
+				{
+					IPoiActorInterface::Execute_SetPoiVisitByWidgetAni(ActorPair.Value, false, InDelayTime);
+				}
+			}
+		}
+	}
+
+	// 操作目标分组
+	if (FPoiMapData* GroupData = PoiActorGroupMap.Find(Group))
+	{
+		for (auto& ActorPair : GroupData->PoiActorKeyMap)
+		{
+			if (IsValid(ActorPair.Value))
+			{
+				IPoiActorInterface::Execute_SetPoiVisitByWidgetAni(ActorPair.Value, GroupVisit, InDelayTime);
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SetGroupPoiVisitByWidgetAni: 未找到分组 '%s'"), *Group);
+	}
+}
+
 AActor* UPoiEventSubsystem::FindPoiActorByGroupAndKey(const FString& InGroup, const FString& InKey)
 {
 	if (InGroup.IsEmpty())

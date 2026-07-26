@@ -345,7 +345,8 @@ void APoiActor::OnWidgetAniPlayedCallback_Implementation(const FString& AniName,
 
 void APoiActor::SetPoiVisitByWidgetAni_Implementation(bool bIsVisit, float DelayTime)
 {
-	if (MyWidgetInstance)
+	//添加不同的可视判断
+	if (MyWidgetInstance && bIsVisit!=bIsVisited)
 	{
 		bIsVisited = bIsVisit;
 		MyWidgetInstance->PlayVisitAni(bIsVisit,DelayTime);

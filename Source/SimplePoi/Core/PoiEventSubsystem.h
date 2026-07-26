@@ -377,6 +377,19 @@ public:
 	//查找整组Actor
 	UFUNCTION(BlueprintPure, Category="PoiSubSystem|PoiFunction", meta=(DisplayName="查找整组PoiActor"))
 	void FindAllActorInGroup(const FString& InGroup, TArray<AActor*>& OutActorArray);
+
+	/**
+	 * 控制整组PoiActor的显示/隐藏动画
+	 * 通过SetPoiVisitByWidgetAni接口批量控制指定分组中所有PoiActor的可见性
+	 * 
+	 * @param GroupVisit 是否显示该组的PoiActor(true=显示动画, false=隐藏动画)
+	 * @param Group      要操作的目标分组名称
+	 * @param bHideOtherGroups 当GroupVisit为true时,是否先对其他分组执行隐藏动画(调用SetPoiVisitByWidgetAni的bIsVisit=false)
+	 *                         GroupVisit为false时此参数无效
+	 * @param InDelayTime 动画延迟播放时间
+	 */
+	UFUNCTION(BlueprintCallable, Category="PoiSubSystem|PoiFunction", meta=(DisplayName="整组PoiActor显隐动画"))
+	void SetGroupPoiVisitByWidgetAni(bool GroupVisit, const FString& Group, bool bHideOtherGroups = false, float InDelayTime = 0.f);
 	//通过分组和Key查找PoiActor
 	UFUNCTION(BlueprintPure, Category="PoiSubSystem|PoiFunction", meta=(DisplayName="查找指定PoiActor"))
 	AActor* FindPoiActorByGroupAndKey(const FString& InGroup, const FString& InKey);

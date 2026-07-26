@@ -62,6 +62,7 @@ POI点标记的核心类，用于在场景中创建可交互的标记点。
 - `FindPoiActorByGroupAndKey()`：通过分组和Key查找POI
 - `FocusToActorByKey()`：通过关键字聚焦
 - `BroadcastFocusMessageByDelegate()`：广播聚焦消息
+- `SetGroupPoiVisitByWidgetAni()`：整组POI显隐动画控制
 - `SendActorStrByTag()`：发送Actor消息
 
 ### 3. APoiBasePawn（摄像机控制Pawn）
@@ -202,7 +203,53 @@ ReceivedActorStrByTag.AddDynamic(this, &MyClass::OnReceiveMessage);
 
 ---
 
-## 六、资源说明
+## 六、分组POI动画控制
+
+`SetGroupPoiVisitByWidgetAni` 是 `UPoiEventSubsystem` 提供的整组POI显隐动画批量控制接口。
+
+### 方法签名
+
+```cpp
+void SetGroupPoiVisitByWidgetAni(
+    bool GroupVisit,              // true=显示动画, false=隐藏动画
+    const FString& Group,         // 目标分组名称
+    bool bHideOtherGroups = false,// 是否先隐藏其他分组(仅 GroupVisit=true 时有效)
+    float InDelayTime = 0.f       // 动画延迟播放时间
+);
+```
+
+### 参数说明
+
+| 参数 | 类型 | 说明 |
+|---|---|---|
+| `GroupVisit` | bool | 控制目标分组的显隐：`true` 播放显示动画，`false` 播放隐藏动画 |
+| `Group` | FString | 目标分组名，对应 `PoiActorGroupMap` 中的 Key |
+| `bHideOtherGroups` | bool | 当 `GroupVisit=true` 时，若设为 `true`，会先遍历其他分组以 `bIsVisit=false` 执行隐藏动画；`GroupVisit=false` 时此参数无效 |
+| `InDelayTime` | float | 传递给每个 Actor 的 `SetPoiVisitByWidgetAni` 的延迟秒数，用于错峰播放 |
+
+### 调用示例
+
+- **显示 "Building_A" 组，并隐藏其他所有组：**
+  ```
+  SetGroupPoiVisitByWidgetAni(true, "Building_A", true, 0.0)
+  ```
+- **仅隐藏 "Building_B" 组：**
+  ```
+  SetGroupPoiVisitByWidgetAni(false, "Building_B", false, 0.0)
+  ```
+- **显示 "Floor_2" 组，不隐藏其他组，每个Actor延迟0.3秒：**
+  ```
+  SetGroupPoiVisitByWidgetAni(true, "Floor_2", false, 0.3)
+  ```
+
+### 实现说明
+
+- 动画实际由每个 PoiActor 的 `IPoiActorInterface::SetPoiVisitByWidgetAni` 接口执行，C++ 层只负责遍历调度
+- 隐藏其他分组时会自动跳过目标分组自身，避免重复调用
+- 使用 `IsValid()` 校验每个 Actor 有效性，防止 pending-kill 对象导致的崩溃
+
+---
+## 七、资源说明
 
 ### 蓝图类
 

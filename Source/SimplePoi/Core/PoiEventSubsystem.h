@@ -374,6 +374,14 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category="PoiSubSystem|PoiFunction", meta=(DisplayName="添加PoiActor到Map"))
 	void AddPoiActorToGroup(AActor* InActor, const bool bIsAddToMessageMap = false);
+	/**
+	* 根据Actor从分组管理系统中移除对应的PoiActor数据
+	*
+	* @param InActor 要从分组中移除的Actor对象
+	*                同时移除FocusMessageMap中对应的聚焦数据,以及PoiActorGroupMap中对应的Actor数据
+	*/
+	UFUNCTION(BlueprintCallable, Category="PoiSubSystem|PoiFunction", meta=(DisplayName="从Map移除PoiActor"))
+	void RemovePoiActorFromGroup(AActor* InActor);
 	//查找整组Actor
 	UFUNCTION(BlueprintPure, Category="PoiSubSystem|PoiFunction", meta=(DisplayName="查找整组PoiActor"))
 	void FindAllActorInGroup(const FString& InGroup, TArray<AActor*>& OutActorArray);

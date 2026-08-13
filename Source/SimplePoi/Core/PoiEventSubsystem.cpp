@@ -55,6 +55,63 @@ void UPoiEventSubsystem::AddPoiActorToGroup(AActor* InActor,const bool bIsAddToM
 	}
 }
 
+void UPoiEventSubsystem::RemovePoiActorFromGroup(AActor* InActor)
+{
+	if (!IsValid(InActor))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RemovePoiActorFromGroup: InActor is invalid"));
+		return;
+	}
+
+	FString GroupStr;
+	FString KeyStr;
+	if (!IPoiActorInterface::Execute_GetGroupAndKey(InActor, GroupStr, KeyStr))
+	{
+		return;
+	}
+
+	// 移除聚焦消息映射中的对应数据
+	if (!KeyStr.IsEmpty())
+	{
+		FocusMessageMap.Remove(KeyStr);
+	}
+
+	// 移除分组映射中的对应Actor数据
+	if (!GroupStr.IsEmpty())
+	{
+		// 指定了分组,直接在该分组中查找并移除
+		if (FPoiMapData* GroupData = PoiActorGroupMap.Find(GroupStr))
+		{
+			GroupData->PoiActorKeyMap.Remove(KeyStr);
+			// 若该分组已无Actor,清理空分组
+			if (GroupData->PoiActorKeyMap.IsEmpty())
+			{
+				PoiActorGroupMap.Remove(GroupStr);
+			}
+		}
+	}
+	else
+	{
+		// 未指定分组,遍历所有分组查找并移除对应Key的Actor
+		TArray<FString> EmptyGroupArray;
+		for (auto& MapElement : PoiActorGroupMap)
+		{
+			if (MapElement.Value.PoiActorKeyMap.Remove(KeyStr) > 0)
+			{
+				if (MapElement.Value.PoiActorKeyMap.IsEmpty())
+				{
+					EmptyGroupArray.Add(MapElement.Key);
+				}
+			}
+		}
+		// 清理已清空的分组
+		for (const FString& EmptyGroup : EmptyGroupArray)
+		{
+			PoiActorGroupMap.Remove(EmptyGroup);
+		}
+	}
+}
+
 void UPoiEventSubsystem::FindAllActorInGroup(const FString& InGroup, TArray<AActor*>& OutActorArray)
 {
 	if (PoiActorGroupMap.Contains(InGroup))

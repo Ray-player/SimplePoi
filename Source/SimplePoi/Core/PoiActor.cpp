@@ -312,7 +312,7 @@ void APoiActor::ChangeWidgetType_Implementation(int Index)
 	}
 }
 
-bool APoiActor::GetGroupAndKey_Implementation(FString& OutGroup, FString& OutKey) const
+bool APoiActor::GetGroupAndKey_Implementation(FString& OutGroup, FString& OutKey)
 {
 	OutGroup = Group;
 	OutKey = FocusMessage.Name;

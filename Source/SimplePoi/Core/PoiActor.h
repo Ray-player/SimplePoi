@@ -90,7 +90,7 @@ public:
 	//需要在蓝图中重写EWidgetOnClicked,ESelected,EUnSelected
 	virtual void BindButtonEvent_Implementation(UButton* InButton) override;
 	virtual void ChangeWidgetType_Implementation(int InIndex) override;
-	virtual bool GetGroupAndKey_Implementation(FString& OutGroup,FString& OutKey) const override;
+	virtual bool GetGroupAndKey_Implementation(FString& OutGroup,FString& OutKey) override;
 	virtual FFocusMessageStruct GetFocusMessage_Implementation() const override { return FocusMessage; }
 	
 	virtual void SetPoiVisitByWidgetAni_Implementation(bool bIsVisitForward, float InDelayTime) override;

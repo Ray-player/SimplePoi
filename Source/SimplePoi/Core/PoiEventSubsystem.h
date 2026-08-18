@@ -262,7 +262,7 @@ public:
 	void FocusToSelf();
 	//获取该PoiActor所属的分组和Key,如果不存在则返回false
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Poi Interface", meta = (DisplayPriority = "2"))
-	bool GetGroupAndKey(FString& OutGroup, FString& OutKey) const;
+	bool GetGroupAndKey(FString& OutGroup, FString& OutKey);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Poi Interface", meta = (DisplayPriority = "2"))
 	FFocusMessageStruct GetFocusMessage() const;
 	//点击widget时触发的事件
@@ -361,6 +361,9 @@ public:
 	//设置当前选中的Actor,并触发选中事件
 	UFUNCTION(BlueprintCallable, Category="PoiSubSystem|PoiFunction", meta=(DisplayName="设置当前选中的Actor"))
 	void SetCurrentSelectedActor(AActor* InActor);
+	//获取当前选中的Actor
+	UFUNCTION(BlueprintPure, Category="PoiSubSystem|PoiFunction", meta=(DisplayName="获取当前选中的Actor"))
+	AActor* GetCurrentSelectedActor() const { return CurrentSelectedActor.Get(); }
 	//直接将聚焦数据添加到FocusMessageMap中
 	UFUNCTION(BlueprintCallable, Category="PoiSubSystem|PoiFunction", meta=(DisplayName="添加聚焦数据到Map"))
 	void AddFocusDataToMap(const FFocusMessageStruct& FocusData);

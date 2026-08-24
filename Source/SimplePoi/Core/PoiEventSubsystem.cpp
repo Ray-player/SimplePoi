@@ -3,6 +3,7 @@
 #include "JsonObjectConverter.h"
 #include "Kismet/GameplayStatics.h"
 #include "SimplePoi/Gameplay/PoiBasePawn.h"
+#include "GameFramework/Actor.h"
 
 
 AActor* UPoiActionSet::GetOuterAsActor()
@@ -509,4 +510,52 @@ bool UPoiEventSubsystem::FindAniSpeed(const FString& AniKeyCut, const FWidgetDat
 		}
 	}
 	return false;
+}
+
+FFocusMessageStruct UPoiEventSubsystem::CreateFocusMessageFromAngles(
+	AActor* Actor, float AzimuthDeg, float ElevationDeg, float Length, float FocusTimes, const FString& Name)
+{
+	FFocusMessageStruct Result;
+
+	if (!IsValid(Actor))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CreateFocusMessageFromAngles: Actor is invalid"));
+		return Result;
+	}
+
+	return CreateFocusMessageFromAnglesAtLocation(Actor->GetActorLocation(), AzimuthDeg, ElevationDeg, Length, FocusTimes, Name);
+}
+
+FFocusMessageStruct UPoiEventSubsystem::CreateFocusMessageFromAnglesAtLocation(
+	const FVector& TargetLocation, float AzimuthDeg, float ElevationDeg, float Length, float FocusTimes, const FString& Name)
+{
+	FFocusMessageStruct Result;
+
+	// 聚焦名称
+	Result.Name = Name;
+
+	const float AzimuthRad = FMath::DegreesToRadians(AzimuthDeg);
+	const float ElevationRad = FMath::DegreesToRadians(ElevationDeg);
+
+	// 计算从聚焦点指向目标点的方向向量 V
+	// V 的长度 = Length
+	// V 在 XY 平面的投影与 +X 轴夹角 = Azimuth
+	// V 与 XY 平面的夹角 = Elevation
+	const float HorizLen = Length * FMath::Cos(ElevationRad);  // XY平面投影长度
+	const FVector V(
+		HorizLen * FMath::Cos(AzimuthRad),   // X
+		HorizLen * FMath::Sin(AzimuthRad),   // Y
+		Length   * FMath::Sin(ElevationRad)  // Z
+	);
+
+	// 聚焦点位置 = 目标点位置 - 方向向量
+	Result.TargetLocation = TargetLocation - V;
+
+	// 聚焦点朝向目标点的旋转
+	Result.TargetRotation = V.Rotation();
+
+	// 聚焦动画用时
+	Result.FocusTimes = FocusTimes;
+
+	return Result;
 }

@@ -504,4 +504,45 @@ public:
 		}
 		return TEXT("");
 	}
+
+	/**
+	 * 根据Actor世界位置、角度和距离，生成摄像机聚焦用的 FFocusMessageStruct
+	 * @param Actor       目标Actor（聚焦点将朝向该Actor的世界位置）
+	 * @param AzimuthDeg  向量在XY平面的投影与X轴正方向的夹角（度），即水平方位角
+	 * @param ElevationDeg 向量与XY平面的夹角（度），正值表示聚焦点低于Actor（仰视）
+	 * @param Length      聚焦点到Actor的距离（世界单位）
+	 * @param FocusTimes  聚焦动画用时（秒），默认1.0
+	 * @param Name        聚焦名称（写入 FocusMessageStruct.Name），默认空字符串
+	 * @return 填充好 TargetLocation 和 TargetRotation 的聚焦数据结构
+	 */
+	UFUNCTION(BlueprintPure, Category="PoiCommonFunction|Data",
+		meta = (DisplayName = "Create Focus Message From Angles (Actor)"))
+	static FFocusMessageStruct CreateFocusMessageFromAngles(
+		AActor* Actor,
+		float AzimuthDeg,
+		float ElevationDeg,
+		float Length,
+		float FocusTimes = 1.0f,
+		const FString& Name = TEXT(""));
+
+	/**
+	 * 根据世界坐标目标点、角度和距离，生成摄像机聚焦用的 FFocusMessageStruct
+	 * 与 Actor 版本逻辑一致，仅将目标 Actor 替换为直接传入的世界坐标点。
+	 * @param TargetLocation 目标点世界坐标（聚焦点将朝向该点）
+	 * @param AzimuthDeg  向量在XY平面的投影与X轴正方向的夹角（度），即水平方位角
+	 * @param ElevationDeg 向量与XY平面的夹角（度），正值表示聚焦点低于目标点（仰视）
+	 * @param Length      聚焦点到目标点的距离（世界单位）
+	 * @param FocusTimes  聚焦动画用时（秒），默认1.0
+	 * @param Name        聚焦名称（写入 FocusMessageStruct.Name），默认空字符串
+	 * @return 填充好 TargetLocation 和 TargetRotation 的聚焦数据结构
+	 */
+	UFUNCTION(BlueprintPure, Category="PoiCommonFunction|Data",
+		meta = (DisplayName = "Create Focus Message From Angles (Location)"))
+	static FFocusMessageStruct CreateFocusMessageFromAnglesAtLocation(
+		const FVector& TargetLocation,
+		float AzimuthDeg,
+		float ElevationDeg,
+		float Length,
+		float FocusTimes = 1.0f,
+		const FString& Name = TEXT(""));
 };

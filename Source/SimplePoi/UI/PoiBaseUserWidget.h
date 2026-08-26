@@ -59,6 +59,10 @@ public:
 	TMap<FString, TObjectPtr<UWidgetAnimation>> AnimationDic;
 	UPROPERTY(BlueprintAssignable, Category = "Event", meta = (DisplayName = "动画播放完成后"))
 	FOnAnimationPlayed OnAnimationPlayed;
+	//当前控件数据
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	FWidgetDataStruct SelfData;
+	
 	//根据结构体初始化控件数据
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable, Category = "Data")
 	void InitWidgetByStruct(APoiActor* InPoiActor,const FWidgetDataStruct& WidgetMes);
@@ -73,9 +77,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable, Category = "AniFunction")
 	void SetVisitByProperties(bool bIsVisit,float InDelayTime);
 protected:
-	//当前控件数据
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
-	FWidgetDataStruct SelfData;
 	
 	//根据关键字获取动画组件,支持模糊匹配
 	UFUNCTION(BlueprintCallable, Category = "AniFunction")
